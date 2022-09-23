@@ -3,12 +3,12 @@ import mongodb from "mongodb";
 import dotenv from "dotenv";
 
 async function main(){
-    // == Load environment variables ==
+    // Load environment variables
     dotenv.config();
 
     // Create an instance of MongoClient and pass in the database URI
     const client = new mongodb.MongoClient(
-        process.env.RESTAURANTINFO_DB_URI
+        process.env.MOVIEREVIEWS_DB_URI
     );
 
     // Attempt to get port from environment variable; default to 8000 if there isn't one
@@ -19,7 +19,7 @@ async function main(){
         await client.connect();
 
         app.listen(port, () => {
-            console.log(`server is running on poart ${port}`)
+            console.log(`server is running on port ${port}`)
         })
     }
     catch(e){
