@@ -1,3 +1,6 @@
+import { json } from "express";
+import { ObjectId } from "mongodb";
+
 // Will hold reference to database movies collection
 let movies;
 
@@ -44,6 +47,42 @@ export default class MoviesDAO{
         catch(e){
             console.error(`unable to issue find command, ${e}`);
             return {moviesList: [], totalNumMovies: 0}
+        }
+    }
+
+    static async getRatings(){
+        let ratings = [];
+        try{
+            ratings = await movies.distinct("rated");
+            return ratings;
+        }
+        catch(e){
+            console.error(`unable to get ratings, ${e}`);
+            return ratings;
+        }
+    }
+
+    static async getMovieById(id){
+        try{
+            return await movies.aggregate([
+                {
+                    $match: {
+                        _id: new ObjectId(id)
+                    }
+                },
+                {
+                    $lookup:{
+                        from: "reviews",            // Collection to join
+                        localField: "_id",          // Field from the input document
+                        foreignField: "movie_id",   // Field from the documents of the "from" collection
+                        as: "reviews"               // Output array field
+                    }
+                }
+            ]).next()
+        }
+        catch(e){
+            console.error(`something went wrong while getting movie by id: ${id}, ${e}`);
+            throw e;
         }
     }
 }
